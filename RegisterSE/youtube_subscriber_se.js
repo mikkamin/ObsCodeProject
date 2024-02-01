@@ -10,18 +10,19 @@ const googleApiKey = "AIzaSyBdE8WIwvVcbbLby2XVW-tm41AOt169PB8"
 const channelId = "UCpZd2ct72njFCZonzRW94iw"
 let prevSubscriberCount = 0
 
-obs.connect(url = 'ws://' + obsHost + ':' + obsPort, password = obsPassword)
+//obs.connect(url = 'ws://' + obsHost + ':' + obsPort, password = obsPassword)
+obs.connect(url = 'ws://' + OBSDEF.host + ':' + OBSDEF.port, password = OBSDEF.password)
 
 async function restartDecreaseSe(obs) {
-    return await obs.call('TriggerMediaInputAction', {"inputName": decreaseSe, "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART"})
+    return await obs.call('TriggerMediaInputAction', { "inputName": decreaseSe, "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART" })
 }
 async function restartIncreaseSe(obs) {
-    return await obs.call('TriggerMediaInputAction', {"inputName": increaseSe, "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART"})
+    return await obs.call('TriggerMediaInputAction', { "inputName": increaseSe, "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART" })
 }
 function callyoutubeDataApi(obs) {
     client.get({
         url: "https://www.googleapis.com/youtube/v3/channels?part=statistics&id=" + channelId + "&key=" + googleApiKey,
-      }, function (error, response, body){
+    }, function (error, response, body) {
         const data = JSON.parse(body);
         const currentSubscriberCount = data["items"][0]["statistics"]["subscriberCount"];
         if (prevSubscriberCount < 1) {
@@ -33,14 +34,14 @@ function callyoutubeDataApi(obs) {
         console.log(currentSubscriberCount);
         if (prevSubscriberCount > currentSubscriberCount) {
             // 登録者減少させる関数はこちら
-            console.log("============= "+decreaseSe+" ================")
+            console.log("============= " + decreaseSe + " ================")
             //restartDecreaseSe(obs)
         } else if (currentSubscriberCount > prevSubscriberCount) {
             // 登録者増加したときはこちら
             restartIncreaseSe(obs)
         }
         prevSubscriberCount = currentSubscriberCount;
-      });
+    });
 }
 
 setTimeout(() => {
